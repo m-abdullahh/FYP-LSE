@@ -1,0 +1,19 @@
+# Gitignore for Python Flask API (search_api/)
+**/*.pyc
+**/**/__pycache__/
+**/venv/
+**/.venv/
+search_api/.venv/
+search_api/.flaskenv
+# Gitignore for Node.js backend (backend/)
+backend/node_modules/
+backend/.env
+backend/.DS_Store
+backend/dist/
+
+# Gitignore for Vite React frontend (frontend/)
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.DS_Store
+frontend/.vite/
