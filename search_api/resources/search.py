@@ -14,17 +14,50 @@ from ml_models.load_models import (
     classifierXG,
     vectorizer,
     label_encoder,
-)
 
-from schemas import (
-    JudgementClassificationSchema,
-    GenericSearchSchema,
-    TrademarkSearchSchema,
+    #NAIVE BAYES MODEL
+    nb_classifier,
+    nb_vectorizer,
+
+    #GEMINI MODEL
+    gemini_model
 )
 
 from ml_models import query_judgement_classification_model
 from ml_models import query_trademark_model
 from ml_models import query_generic_search_model
+from ml_models import run_query,extract_integer
+from ml_models import process_query_with_gemini
+from schemas import (
+    JudgementClassificationSchema,
+    GenericSearchSchema,
+    TrademarkSearchSchema,ChatBotSchema
+)
+
+def perform_search(query, prediction, generic_model, generic_df, generic_required_columns, 
+                   tm_df, tm_embedder, tm_title_embeddings, tm_desc_embeddings):
+    if prediction == "Case Search":
+        # Call Generic Search Model query
+        results = query_generic_search_model(generic_model, generic_df, generic_required_columns, query)
+        return results
+
+    elif prediction == "Trademark Ordinance Search":
+        # Call Trademark Model query
+        results = query_trademark_model(query, tm_df, tm_embedder, tm_title_embeddings, tm_desc_embeddings, "text")
+        return results
+
+    elif prediction == "Search by Section Number":
+        # Extract any integer (assumed to be a section number) using regex
+        section_no = int(extract_integer(query))
+        if section_no:
+            print(f"Extracted Number: {section_no}")
+            # Call Trademark Model query by section number
+            query = section_no
+            results = query_trademark_model(query, tm_df, tm_embedder, tm_title_embeddings, tm_desc_embeddings, "section_no")
+            return results
+        else:
+            return "No number found in the query."
+
 
 blp = Blueprint(
     "searches",
@@ -91,4 +124,23 @@ class JudgementClassification(MethodView):
             vectorizer,
             label_encoder,
         )
+        return {"result": result}
+    
+#! Chatbot API
+@blp.route("/chatbot")
+class ChatBot(MethodView):
+    @blp.arguments(ChatBotSchema, location='query')
+    def get(self, search_data):
+        query = search_data.get("text")
+        if not query:
+            return {"error": "No text query provided"}, 400
+
+        
+
+        prediction = run_query(query,nb_classifier, nb_vectorizer)
+
+        gemini_query = perform_search(query, prediction, generic_model, generic_df, generic_required_columns, 
+                   tm_df, tm_embedder, tm_title_embeddings, tm_desc_embeddings)
+        
+        result = process_query_with_gemini(gemini_query, gemini_model)
         return {"result": result}

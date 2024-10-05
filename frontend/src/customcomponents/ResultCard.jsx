@@ -4,86 +4,95 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import jsPDF from "jspdf";
+import "jspdf-autotable";
+import { Button } from "@/components/ui/button";
 
 const ResultCard = ({ result, result_type }) => {
+  const generatePDF = () => {
+    const doc = new jsPDF();
+
+    doc.setFontSize(12);
+    const titleLines = doc.splitTextToSize(result.Title, 180);
+    doc.text(titleLines, 14, 30);
+
+    const tableStartY = 30 + titleLines.length * 5;
+
+    // Add content using autoTable
+    doc.autoTable({
+      startY: tableStartY,
+      head: [["Field", "Content"]],
+      body: [
+        ["Title", result.Title],
+        ["Date", result.Date],
+        ["Facts", result.Facts],
+        ["Issues Framed", result.Issues_framed],
+        ["Decisions/Holdings", result.Decisions_Holdings],
+        ["Reasoning and Analysis", result.Reasoning_and_Analysis],
+        ["Judgment Results", result.Judgement_Result],
+      ],
+      theme: "striped",
+      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+      bodyStyles: { valign: "top" },
+      columnStyles: { 0: { cellWidth: 40 }, 1: { cellWidth: "auto" } },
+      margin: { top: 30 },
+    });
+
+    // Save the PDF
+    doc.save(`${result.Title}.pdf`);
+  };
+
   console.log(result);
   const [isExpanded, setIsExpanded] = useState(false);
-
-  // const generatePDF = () => {
-  //   const doc = new jsPDF();
-
-  //   // Add title
-  //   doc.setFontSize(16);
-  //   doc.text(result.Title, 10, 10);
-
-  //   // Add date
-  //   doc.setFontSize(12);
-  //   doc.text(result.Date, 10, 20);
-
-  //   // Add sections
-  //   doc.setFontSize(12);
-  //   doc.text("Facts:", 10, 30);
-  //   doc.setFontSize(10);
-  //   doc.text(result.Facts, 10, 40);
-
-  //   // Add decisions/holdings
-  //   doc.setFontSize(12);
-  //   doc.text("Decisions/Holdings:", 10, 60);
-  //   doc.setFontSize(10);
-  //   doc.text(result.Decisions_Holdings, 10, 70, { maxWidth: 190 });
-
-  //   // Add issues framed
-  //   doc.setFontSize(12);
-  //   doc.text("Issues Framed:", 10, 100);
-  //   doc.setFontSize(10);
-  //   doc.text(result.Issues_framed, 10, 110, { maxWidth: 190 });
-
-  //   // Add reasoning and analysis
-  //   doc.setFontSize(12);
-  //   doc.text("Reasoning and Analysis:", 10, 140);
-  //   doc.setFontSize(10);
-  //   doc.text(result.Reasoning_and_Analysis, 10, 150, { maxWidth: 190 });
-
-  //   // Add result
-  //   doc.setFontSize(12);
-  //   doc.text("Result:", 10, 180);
-  //   doc.setFontSize(10);
-  //   doc.text(result.result, 10, 190);
-
-  //   // Save the PDF
-  //   doc.save(`${result.Title || "Legal_Case"}.pdf`);
-  // };
 
   return (
     <>
       {result_type === "generic" && (
-        <Card className="mb-4 w-full cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
+        <Card className="mb-4 w-full cursor-pointer text-xs md:text-md">
           <CardHeader>
             <div className="flex justify-between items-start">
-              <CardTitle className={"font-semibold text-md " + `${!isExpanded && "line-clamp-1"}`}>{result.Title}</CardTitle>
-              {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+              <CardTitle className={"font-semibold text-xs md:text-md " + `${!isExpanded && "line-clamp-2 md:line-clamp-1"}`}>
+                {result.Title}
+              </CardTitle>
+              {isExpanded ? (
+                <ChevronUp className="w-5 h-5 shrink-0" onClick={() => setIsExpanded(!isExpanded)} />
+              ) : (
+                <ChevronDown className="w-5 h-5 shrink-0" onClick={() => setIsExpanded(!isExpanded)} />
+              )}
             </div>
             {/* <CardDescription className={"mt-2 text-sm " + `${!isExpanded && "line-clamp-1"}`}>{result.Title}</CardDescription> */}
           </CardHeader>
           <CardContent>
-            <div className="flex justify-between items-center">
-              <span className="text-muted-foreground text-sm">{result.Date}</span>
-              <Badge>{result.result}</Badge>
+            <div className="flex justify-between items-center text-xs">
+              <div className="space-x-2">
+                <Badge variant="outline" className="text-muted-foreground ">
+                  {result.Date}
+                </Badge>
+
+                <Badge>{result.result}</Badge>
+              </div>
+              <Badge
+                onClick={() => {
+                  generatePDF();
+                  setIsExpanded(false);
+                }}
+              >
+                Save as PDF
+              </Badge>
             </div>
             {isExpanded && (
-              <div className="gap-4 grid mt-4">
+              <div className="gap-4 grid mt-4 text-xs text-justify ">
                 <Separator />
                 <div>
                   <h3 className="mb-2 font-semibold">Issues Framed</h3>
-                  <p className="text-sm">{result.Issues_framed}</p>
+                  <p className="">{result.Issues_framed}</p>
                 </div>
                 <div>
                   <h3 className="mb-2 font-semibold">Decision/Holdings</h3>
-                  <p className="text-sm">{result.Decisions_Holdings}</p>
+                  <p className="">{result.Decisions_Holdings}</p>
                 </div>
                 <div>
                   <h3 className="mb-2 font-semibold">Reasoning and Analysis</h3>
-                  <p className="text-sm">{result.Reasoning_and_Analysis}</p>
+                  <p className="">{result.Reasoning_and_Analysis}</p>
                 </div>
               </div>
             )}

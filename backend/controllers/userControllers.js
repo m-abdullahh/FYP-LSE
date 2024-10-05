@@ -9,13 +9,13 @@ const createtoken = (_id) => {
 };
 
 exports.registerUser = async (req, res) => {
-  console.log(req.body);
+  console.log("REGISTER", req.body);
   const { name, email, password } = req.body;
   try {
     const user = await User.signUp(name, email, password);
 
     const token = createtoken(user._id);
-    res.status(200).json({ email, token });
+    res.status(200).json({ name, email, token });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -29,7 +29,7 @@ exports.loginUser = async (req, res) => {
     const user = await User.signIn(email, password);
     const token = createtoken(user._id);
 
-    res.status(200).json({ email, token });
+    res.status(200).json({ name: user.name, email, token });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

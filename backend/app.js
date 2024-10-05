@@ -13,12 +13,14 @@ mongoose
 // MIDDLEWARES
 app.use(express.json());
 app.use(cookieparser());
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({ origin: "*" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/", require("./routes/userRoutes"));
+app.use("/search", require("./routes/searchRoutes"));
+app.use("/searchhistory", require("./routes/historyRoutes"));
 
 const port = 8000;
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Server is running on port: ${port}`);
 });

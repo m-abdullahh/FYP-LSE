@@ -25,7 +25,7 @@ const TextSearchInput = ({ form, onSubmit, inputType = "text", searchType, place
             </FormItem>
           )}
         />
-        <Button className="px-2 sm:px-4 py-2 sm:py-2">
+        <Button className="px-2 sm:px-4 py-2 sm:py-2 bg-blue-700 hover:bg-blue-700/90">
           <ChevronRight className="block sm:hidden w-6 h-4 shrink-0" />
           <span className="sm:block hidden">Search</span>
         </Button>

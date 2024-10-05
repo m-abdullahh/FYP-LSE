@@ -6,9 +6,10 @@ import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
 
 import { uselogin } from "@/hooks/useLogin";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const { login, isLoading, error } = uselogin();
   const [formState, setFormState] = useState({
     email: "",
@@ -58,10 +59,11 @@ export default function LoginPage() {
         loading: "Logging in...",
         success: () => {
           setFormState({ email: "", password: "" });
+          navigate("/");
           return "Login successful! Welcome!";
         },
         error: () => {
-          return error.message || "Login failed. Please try again.";
+          return error || "Login failed. Please try again.";
         },
       }
     );
@@ -69,7 +71,7 @@ export default function LoginPage() {
 
   return (
     <div>
-      <Card className="flex flex-col mx-auto max-w-lg lg:w-1/4 mt-14 lg:mt-20">
+      <Card className="flex flex-col mx-auto max-w-lg lg:w-2/4 mt-16 lg:mt-20">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>Enter your credentials to access your account</CardDescription>
@@ -85,7 +87,7 @@ export default function LoginPage() {
               <Input id="password" name="password" type="password" value={formState.password} onChange={handleInputChange} required />
             </div>
             <Button disabled={isLoading} type="submit" className=" bg-blue-700 hover:bg-blue-700/90 w-full">
-              {isLoading ? "Logging..." : "Create an account"}
+              {isLoading ? "Logging..." : "Login In"}
             </Button>
           </form>
           <div className="mt-4 text-center text-md">

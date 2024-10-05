@@ -63,12 +63,14 @@ export default function RegisterPage() {
       signup(formState.name, formState.email, formState.password), // Call the signup function
       {
         loading: "Creating account...",
-        success: () => {
+        success: (response) => {
           setFormState({ name: "", email: "", password: "" });
+          console.log(error);
+          navigate("/");
           return "Registration and Login successful! Welcome!";
         },
         error: () => {
-          return error.message || "Registration failed. Please try again.";
+          return error || "Registration failed. Please try again.";
         },
       }
     );

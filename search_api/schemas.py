@@ -26,3 +26,16 @@ class TrademarkSearchSchema(Schema):
 
 class JudgementClassificationSchema(Schema):
     text = fields.String(required=True, load_only=True)
+
+
+
+class ChatBotSchema(Schema):
+    text = fields.String(required=True, load_only=True)
+
+    # user_id = fields.String(required=False, load_only=True, nullable=True)
+
+    @validates_schema
+    def validate_text(self, data, **kwargs):
+        text = data.get("text")
+        if not text or len(text.strip()) == 0:
+            raise ValidationError("The 'text' field cannot be empty.")

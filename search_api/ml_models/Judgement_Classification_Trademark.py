@@ -9,7 +9,7 @@ from xgboost import XGBClassifier
 
 
 def load_judgement_classification_model():
-    df = pd.read_csv("./ml_models/DataSets/augmented_trademark_dataset.csv")
+    df = pd.read_excel("./ml_models/DataSets/generic_cases_dataset.xlsx")
     df = df.drop_duplicates()
     df["Facts"] = df["Facts"].fillna("")
 
@@ -72,7 +72,7 @@ def load_judgement_classification_model():
     classifierXG = XGBClassifier(random_state=42)
     classifierXG.fit(X_train_tfidf, y_train)
 
-    return classifierSVM, classifierRF, classifierXG, vectorizer, label_encoder
+    return classifierSVM, classifierRF,classifierXG, vectorizer, label_encoder
 
 
 # Function to predict class using specified classifier

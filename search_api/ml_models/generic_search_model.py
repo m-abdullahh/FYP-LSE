@@ -75,10 +75,7 @@ def query_generic_search_model(model, df, required_columns, query, top_k=3):
     return article_data_list
 
 if __name__ == "__main__":
-    # Set save_embeddings to True only the first time you run this
-    model, df, required_columns = load_generic_search_model(save_embeddings=True)
-    
-    # For subsequent runs, use save_embeddings=False
+    model, df, required_columns = load_generic_search_model(save_embeddings=False)
     # model, df, required_columns = load_generic_search_model(save_embeddings=False)
     
     query = "trademark for food products"

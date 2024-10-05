@@ -1,42 +1,18 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* App.css */
+.fade-enter {
+  @apply opacity-0 translate-y-2; /* Start invisible and slightly below */
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.fade-enter-active {
+  @apply opacity-100 translate-y-0; /* Transition to visible */
+  transition: opacity 300ms, transform 300ms; /* Animation duration */
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.fade-exit {
+  @apply opacity-100 translate-y-0; /* Start fully visible */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+.fade-exit-active {
+  @apply opacity-0 translate-y-2; /* Transition to invisible and slightly below */
+  transition: opacity 6000ms, transform 3000ms; /* Animation duration */
 }
