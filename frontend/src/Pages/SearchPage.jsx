@@ -1,17 +1,17 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import axios from "axios";
 import TextSearchInput from "@/customcomponents/TextSearchInput";
 import ResultCard from "@/customcomponents/ResultCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { useAuthContext } from "@/hooks/useAuthContext";
-import { useHistoryContext } from "@/context/userHistoryContext";
+import useSearch from "@/hooks/useSearch"; // Import the custom hook
+import { useLocation } from "react-router-dom"; // Import useLocation
+
 //! TEXT SCHEMA
 const textSchema = z
   .object({
@@ -34,90 +34,73 @@ const textSchema = z
   });
 
 const SearchPage = () => {
-  const { addSearchEntry } = useHistoryContext();
-  const { user } = useAuthContext(); // Get the user context
+  const location = useLocation(); // Access location
+  const { state } = location; // Retrieve state
   const [searchType, setSearchType] = useState("generic");
   const [inputType, setInputType] = useState("text");
-  const [loading, setLoading] = useState(false); //! Loading state
-  const [hasSearched, setHasSearched] = useState(false);
-  const [genericSearchResult, setGenericSearchResult] = useState([]);
-  const [trademarkSearchResult, setTrademarkSearchResult] = useState([]);
-  const [judgementClassificationResult, setJudgementClassificationResult] = useState([]);
 
-  const handleSearchType = (type) => {
-    form.reset();
-    setGenericSearchResult([]);
-    setJudgementClassificationResult([]);
-    setTrademarkSearchResult([]);
-    setSearchType(type);
-  };
+  // Use the custom hook
+  const {
+    setGenericSearchResult,
+    setJudgementClassificationResult,
+    setTrademarkSearchResult,
+    search,
+    genericSearchResult,
+    trademarkSearchResult,
+    judgementClassificationResult,
+    loading,
+    hasSearched,
+  } = useSearch();
 
-  //! Form State
+  // Initialize form state
   const form = useForm({
     resolver: zodResolver(textSchema),
     defaultValues: { text: "", section: "" },
   });
 
-  //! ON SUBMIT
-
-  const onSubmit = async (data) => {
-    setLoading(true); //! Start loading
-
-    var query_data = {};
-
-    try {
-      if (searchType === "generic") {
-        query_data = { text: data.text };
-        const response = await axios.get("http://192.168.0.2:8000/search/genericsearch", {
-          params: query_data,
-        });
-        setGenericSearchResult(response.data);
-      } else if (searchType === "trademark") {
-        if (inputType === "section") {
-          query_data = { section_no: data.section, query_type: "section_no" };
+  useEffect(() => {
+    if (state) {
+      // Set the search type and input based on the state
+      setSearchType(state.searchType);
+      if (state.queryData) {
+        if (state.searchType === "trademark" && Number.isInteger(state.queryData)) {
+          setInputType("section");
+          form.setValue("section", state.queryData); // Set section value
         } else {
-          query_data = { text: data.text, query_type: "text" };
+          setInputType("text");
+          form.setValue("text", state.queryData.text); // Set text value
         }
-        const response = await axios.get("http://192.168.0.2:8000/search/trademarksearch", {
-          params: query_data,
-        });
-        setTrademarkSearchResult(response.data);
-      } else if (searchType === "judgement") {
-        query_data = { text: data.text };
-        const response = await axios.get("http://192.168.0.2:8000/search/judgementclassification", {
-          params: query_data,
-        });
-        setJudgementClassificationResult(response.data);
       }
-
-      if (user) {
-        const searchEntry = {
-          searchType,
-          query_data,
-          timestamp: new Date().toISOString(),
-        };
-        addSearchEntry(searchEntry);
-      }
-    } catch (error) {
-      console.error(error); // Handle any errors that occurred during the request
     }
+    search(searchType, inputType, form.getValues(), true); // Perform search based on the state
+  }, [state, form]);
 
-    setLoading(false); //! Stop loading
-    setHasSearched(true); // Set hasSearched to true when a search is performed
+  const handleSearchType = (type) => {
+    setSearchType(type); // Set the search type
+    // Reset the form and search results
+    form.reset();
+    setGenericSearchResult([]);
+    setJudgementClassificationResult([]);
+    setTrademarkSearchResult([]);
+  };
+
+  // On submit
+  const onSubmit = async (data) => {
+    await search(searchType, inputType, data); // Call the search function from the custom hook
   };
 
   return (
     <div className="flex flex-col min-h-screen mx-2">
       <h1 className="mt-6 mb-4 font-extrabold text-3xl text-center">Legal Search Engine</h1>
       <main className="flex justify-center">
-        <SearchTypeRadio {...{ searchType, handleSearchType }} />
+        <SearchTypeRadio searchType={searchType} handleSearchType={handleSearchType} />
       </main>
       <section className="mx-2">
         {searchType === "generic" && <TextSearchInput {...{ form, onSubmit, searchType }} />}
         {searchType === "trademark" && (
           <TrademarkSearch
             {...{ form, onSubmit, inputType, setInputType, searchType }}
-            placeholder={inputType == "section" ? "Enter Section No." : "Enter Text"}
+            placeholder={inputType === "section" ? "Enter Section No." : "Enter Text"}
           />
         )}
         {searchType === "judgement" && <TextSearchInput {...{ form, onSubmit, searchType }} />}
@@ -131,16 +114,13 @@ const SearchPage = () => {
         {loading ? (
           <div className="flex w-full flex-col space-y-3">
             <Skeleton className="h-[125px] w-full rounded-xl" />
-            <Skeleton className="h-[125px] w-full rounded-xl" />
-            <Skeleton className="h-[125px] w-full rounded-xl" />
           </div>
         ) : (
           <>
-            {Array.isArray(genericSearchResult) &&
-              genericSearchResult.length >= 1 &&
+            {genericSearchResult.length > 0 &&
               genericSearchResult.map((result, index) => <ResultCard key={index} result={result} result_type={searchType} />)}
 
-            {trademarkSearchResult &&
+            {trademarkSearchResult.length > 0 &&
               trademarkSearchResult.map((result, index) => <ResultCard key={index} result={result} result_type={searchType} />)}
 
             {judgementClassificationResult.result && <ResultCard result={judgementClassificationResult} result_type={searchType} />}
@@ -153,24 +133,18 @@ const SearchPage = () => {
 
 const SearchTypeRadio = ({ searchType, handleSearchType }) => {
   return (
-    <RadioGroup value={searchType} className="flex flex-wrap justify-center">
+    <RadioGroup value={searchType} onValueChange={handleSearchType} className="flex flex-wrap justify-center">
       <div className="flex items-center space-x-2">
         <RadioGroupItem value="generic" id="generic" />
-        <Label htmlFor="generic" onClick={() => handleSearchType("generic")}>
-          Generic Cases
-        </Label>
+        <Label htmlFor="generic">Generic Cases</Label>
       </div>
       <div className="flex items-center space-x-2">
         <RadioGroupItem value="trademark" id="trademark" />
-        <Label htmlFor="trademark" onClick={() => handleSearchType("trademark")}>
-          Trademark Ordinance
-        </Label>
+        <Label htmlFor="trademark">Trademark Ordinance</Label>
       </div>
       <div className="flex items-center space-x-2">
         <RadioGroupItem value="judgement" id="judgement" />
-        <Label htmlFor="judgement" onClick={() => handleSearchType("judgement")}>
-          Judgement Classification
-        </Label>
+        <Label htmlFor="judgement">Judgement Classification</Label>
       </div>
     </RadioGroup>
   );
@@ -184,7 +158,7 @@ const TrademarkSearch = ({ form, onSubmit, inputType, setInputType, searchType, 
         defaultValue="text"
         onValueChange={(value) => {
           setInputType(value);
-          form.reset();
+          form.reset(); // Reset form when input type changes
         }}
       >
         <SelectTrigger className="w-[100px]">

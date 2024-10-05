@@ -8,8 +8,21 @@ import toast from "react-hot-toast";
 import { useLogout } from "@/hooks/useLogout";
 import { useAuthContext } from "@/hooks/useAuthContext";
 import { useHistoryContext } from "@/context/userHistoryContext";
+import useSearch from "@/hooks/useSearch"; // Import the custom hook
 
 const Navbar = () => {
+  const {
+    setGenericSearchResult,
+    setJudgementClassificationResult,
+    setTrademarkSearchResult,
+    search,
+    genericSearchResult,
+    trademarkSearchResult,
+    judgementClassificationResult,
+    loading: searchLoading,
+    hasSearched,
+  } = useSearch();
+
   const navigate = useNavigate();
   const { user } = useAuthContext();
   const { logout } = useLogout();
@@ -21,18 +34,22 @@ const Navbar = () => {
     navigate("/");
   };
 
-  const handleHistoryClick = (entry) => () => {
-    if (entry.searchType === "generic") {
-      navigate("/search", { state: {hasSearched:true, searchType: "generic", text: entry.query_data.text } });
-    } else if (entry.searchType === "trademark") {
-      if (entry.query_data.section) {
-        navigate("/search", { state: {hasSearched:true, searchType: "trademark", inputType: "section", section: entry.query_data.section } });
-      } else {
-        navigate("/search", { state: {hasSearched:true, searchType: "trademark", inputType: "text", text: entry.query_data.text } });
-      }
+  const handleHistoryClick = (entry) => async () => {
+    console.log("ENTRY", entry);
+    // Perform the search based on the entry's search type and query data
+    switch (entry.searchType) {
+      case "generic":
+        navigate("/search", { state: { searchType: entry.searchType, queryData: entry.query_data } }); // Navigate to the search results page
+        break;
+      case "trademark":
+        // Check if the entry's query data is an integer
+        const isInteger = Number.isInteger(entry.query_data);
+        navigate("/search", { state: { searchType: entry.searchType, queryData: entry.query_data } }); // Navigate to the search results page
+        break;
+      case "judgement":
+        navigate("/search", { state: { searchType: entry.searchType, queryData: entry.query_data } }); // Navigate to the search results page
+        break;
     }
-    else if (entry.searchType === "judgement") {
-      navigate("/search", { state: {hasSearched:true, searchType: "judgement", text: entry.query_data.text } });
   };
 
   return (
@@ -102,10 +119,8 @@ const Navbar = () => {
 
               <div className="mt-6">
                 <Button variant="outline" className="w-full" onClick={handleLogout}>
-                  <>
-                    <LogOutIcon className="w-4 h-4 mr-2" />
-                    Logout
-                  </>
+                  <LogOutIcon className="w-4 h-4 mr-2" />
+                  Logout
                 </Button>
               </div>
             </div>
