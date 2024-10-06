@@ -17,7 +17,7 @@ def process_query_with_gemini(gemini_query, gemini_model):
     concatenated_data = '\n\n'.join([', '.join([f'{key}: {value}' for key, value in item.items()]) for item in gemini_query])
 
     # Create the prompt for rephrasing
-    prompt = f"Rephrase the cases details in chatbot reply format \n\nDATA:\n{concatenated_data}"
+    prompt = f"Summarize and Concise it extremely into Important Details. reply shouldnt have anything like Here is the reposnse or SUMMARY: etc\n DATA:  \n{concatenated_data}"
 
     # Generate rephrased content using the Gemini model
     response = gemini_model.generate_content(prompt)

@@ -27,7 +27,7 @@ export const useSignup = () => {
       }
 
       // Handle successful signup
-      console.log(json.token);
+      // console.log(json.token);
       localStorage.setItem("user", JSON.stringify(json));
       dispatch({ type: "LOGIN", payload: json });
     } catch (err) {

@@ -65,7 +65,7 @@ export default function RegisterPage() {
         loading: "Creating account...",
         success: (response) => {
           setFormState({ name: "", email: "", password: "" });
-          console.log(error);
+          // console.log(error);
           navigate("/");
           return "Registration and Login successful! Welcome!";
         },

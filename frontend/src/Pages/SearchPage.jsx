@@ -59,7 +59,8 @@ const SearchPage = () => {
   });
 
   useEffect(() => {
-    if (state) {
+    if (state && !state.searchType === "") {
+      // console.log("STATE", state);
       // Set the search type and input based on the state
       setSearchType(state.searchType);
       if (state.queryData) {
@@ -71,8 +72,8 @@ const SearchPage = () => {
           form.setValue("text", state.queryData.text); // Set text value
         }
       }
+      search(searchType, inputType, form.getValues(), true); // Perform search based on the state
     }
-    search(searchType, inputType, form.getValues(), true); // Perform search based on the state
   }, [state, form]);
 
   const handleSearchType = (type) => {

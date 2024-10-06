@@ -27,7 +27,7 @@ const Navbar = () => {
   const { user } = useAuthContext();
   const { logout } = useLogout();
   const { searchHistory, loading, error } = useHistoryContext(); // Get search history from context
-  console.log(searchHistory);
+  // console.log(searchHistory);
   const handleLogout = () => {
     logout();
     toast.success("Logged out successfully");
@@ -35,7 +35,7 @@ const Navbar = () => {
   };
 
   const handleHistoryClick = (entry) => async () => {
-    console.log("ENTRY", entry);
+    // console.log("ENTRY", entry);
     // Perform the search based on the entry's search type and query data
     switch (entry.searchType) {
       case "generic":
@@ -55,15 +55,15 @@ const Navbar = () => {
   return (
     <header className="flex items-center px-2 lg:px-2 h-12 pt-2">
       <Link className="flex justify-center items-center cursor-pointer" to="/">
-        <Scale className="w-6 h-6" />
+        <Scale className="w-6 h-6  " />
       </Link>
       <nav className="flex gap-4 sm:gap-6 ml-auto font-medium text-sm mx-4">
         <Link className="underline-offset-4 hover:underline transition hover:duration-200 cursor-pointer ease-in-out hidden sm:block" to="/search">
           Search Engine
         </Link>
-        <Link className="underline-offset-4 hover:underline transition hover:duration-200 cursor-pointer ease-in-out hidden sm:block" to="/chatbot">
+        {/* <Link className="underline-offset-4 hover:underline transition hover:duration-200 cursor-pointer ease-in-out hidden sm:block" to="/chatbot">
           Chatbot
-        </Link>
+        </Link> */}
         <Link className="underline-offset-4 hover:underline transition hover:duration-200 cursor-pointer ease-in-out hidden sm:block" to="/aboutus">
           About Us!
         </Link>

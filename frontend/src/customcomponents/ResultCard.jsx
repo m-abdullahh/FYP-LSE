@@ -41,7 +41,7 @@ const ResultCard = ({ result, result_type }) => {
     doc.save(`${result.Title}.pdf`);
   };
 
-  console.log(result);
+  // console.log(result);
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (

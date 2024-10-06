@@ -86,7 +86,7 @@ export default function LoginPage() {
               <Label htmlFor="password">Password</Label>
               <Input id="password" name="password" type="password" value={formState.password} onChange={handleInputChange} required />
             </div>
-            <Button disabled={isLoading} type="submit" className=" bg-blue-700 hover:bg-blue-700/90 w-full">
+            <Button disabled={isLoading} type="submit" className=" bg-blue hover:bg-blue-700/90 w-full">
               {isLoading ? "Logging..." : "Login In"}
             </Button>
           </form>

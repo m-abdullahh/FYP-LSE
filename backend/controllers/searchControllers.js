@@ -2,7 +2,7 @@ const FLASK_API_BASE_URL = "http://localhost:5000/search"; // Adjust the URL and
 const axios = require("axios");
 
 exports.genericsearch = async (req, res) => {
-  console.log(req.query);
+  console.log("GENERIC SEARCH: ", req.query);
   const { text } = req.query;
   if (!text) {
     return res.status(400).json({ error: "No text query provided" });
@@ -49,6 +49,7 @@ exports.judgementclassification = async (req, res) => {
 };
 
 exports.chatbot = async (req, res) => {
+  console.log("CHATBOT: ", req.query);
   const { text } = req.query;
   if (!text) {
     return res.status(400).json({ error: "No text query provided" });
