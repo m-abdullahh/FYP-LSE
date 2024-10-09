@@ -55,8 +55,36 @@ const saveSearchHistory = async (req, res) => {
   }
 };
 
+const deleteSingleSearchHistory = async (req, res) => {
+  const { historyId } = req.params; // Extract the historyId from request params
+  console.log("Delete Single History Called", historyId);
+  const userId = req.user._id; // Get user ID from authenticated user
+
+  try {
+    const response = await SearchHistory.deleteSearchHistoryById(userId, historyId);
+
+    if (!response) {
+      return res.status(404).json({
+        success: false,
+        message: "Search history entry not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Search history entry deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getSearchHistory,
   deleteSearchHistory,
   saveSearchHistory,
+  deleteSingleSearchHistory,
 };

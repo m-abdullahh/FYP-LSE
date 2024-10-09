@@ -16,6 +16,12 @@ app.use(cookieparser());
 app.use(cors({ origin: "*" }));
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware to log the request URL
+app.use((req, res, next) => {
+  console.log(`Request received: ${req.method} ${req.originalUrl}`);
+  next(); // Pass control to the next middleware or route handler
+});
+
 app.use("/", require("./routes/userRoutes"));
 app.use("/search", require("./routes/searchRoutes"));
 app.use("/searchhistory", require("./routes/historyRoutes"));

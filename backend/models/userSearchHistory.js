@@ -56,6 +56,13 @@ searchHistorySchema.statics.saveSearchHistory = async function (userId, searchTy
   }
 };
 
+searchHistorySchema.statics.deleteSearchHistoryById = async function (userId, historyId) {
+  return await this.findOneAndDelete({
+    _id: historyId,
+    userId: userId, // Ensure the user can only delete their own history
+  });
+};
+
 const SearchHistory = mongoose.model("SearchHistory", searchHistorySchema);
 
 module.exports = SearchHistory;

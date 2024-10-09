@@ -68,7 +68,7 @@ export const HistoryProvider = ({ children }) => {
 
     try {
       const token = user.token;
-      await axios.delete(`http://192.168.0.2:8000/searchhistory/${entryId}`, {
+      await axios.delete(`http://192.168.0.2:8000/searchhistory/?${entryId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

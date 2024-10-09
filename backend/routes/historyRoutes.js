@@ -1,5 +1,5 @@
 const express = require("express");
-const { getSearchHistory, deleteSearchHistory, saveSearchHistory } = require("../controllers/historyController");
+const { getSearchHistory, deleteSearchHistory, saveSearchHistory, deleteSingleSearchHistory } = require("../controllers/historyController");
 const requireAuth = require("../middleware/requireAuth");
 // Get Search History
 const router = express.Router();
@@ -14,5 +14,7 @@ router.get("/", getSearchHistory);
 router.post("/", saveSearchHistory);
 // Delete Search History
 router.delete("/", deleteSearchHistory);
+
+router.delete("/:historyId", deleteSingleSearchHistory);
 
 module.exports = router;
