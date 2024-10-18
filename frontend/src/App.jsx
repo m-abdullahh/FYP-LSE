@@ -9,13 +9,15 @@ import { Toaster } from "react-hot-toast";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import ChatBotComp from "./customcomponents/ChatbotComp";
 import "./App.css";
+import React from "react";
+
 function App() {
   const location = useLocation();
+  const contentRef = React.createRef();
+
   return (
     <div className="flex flex-col min-h-screen px-2 bg-muted">
-      <div className="transition-opacity duration-300">
-        <ChatBotComp />
-      </div>
+      <ChatBotComp />
       <Toaster position="bottom-right" />
       <Navbar />
       <TransitionGroup>
@@ -24,7 +26,7 @@ function App() {
           classNames="fade" // Animation class names prefix
           timeout={300} // Duration of the transition
         >
-          <div className="transition-opacity duration-300">
+          <div className="transition-opacity duration-300" ref={contentRef}>
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/search" element={<SearchPage />} />

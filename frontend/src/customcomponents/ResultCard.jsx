@@ -5,10 +5,10 @@ import { Separator } from "@/components/ui/separator";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { Button } from "@/components/ui/button";
 
 const ResultCard = ({ result, result_type }) => {
-  const generatePDF = () => {
+  console.log(result);
+  const generateGenericPDF = () => {
     const doc = new jsPDF();
 
     doc.setFontSize(12);
@@ -39,6 +39,37 @@ const ResultCard = ({ result, result_type }) => {
 
     // Save the PDF
     doc.save(`${result.Title}.pdf`);
+  };
+
+  const generateTrademarkPDF = () => {
+    const doc = new jsPDF();
+
+    doc.setFontSize(12);
+    const titleLines = doc.splitTextToSize(result.title, 180);
+    doc.text(titleLines, 14, 30);
+
+    const tableStartY = 30 + titleLines.length * 5;
+
+    // Add content using autoTable
+    doc.autoTable({
+      startY: tableStartY,
+      head: [["Field", "Content"]],
+      body: [
+        ["Title", result.title],
+        ["Chapter No. ", result.chapter_no],
+        ["Section No", `${result.sect_no} (${result.subsec_1}) (${result.subsec_2}) (${result.subsec_3})`],
+        ["Section Discription", result.sect_desc],
+        ["Subsection Discription", result.subsec_desc],
+      ],
+      theme: "striped",
+      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+      bodyStyles: { valign: "top" },
+      columnStyles: { 0: { cellWidth: 40 }, 1: { cellWidth: "auto" } },
+      margin: { top: 30 },
+    });
+
+    // Save the PDF
+    doc.save(`Sect.[${result.sect_no}]${result.title}.pdf`);
   };
 
   // console.log(result);
@@ -72,7 +103,7 @@ const ResultCard = ({ result, result_type }) => {
               </div>
               <Badge
                 onClick={() => {
-                  generatePDF();
+                  generateGenericPDF();
                   setIsExpanded(false);
                 }}
               >
@@ -105,11 +136,17 @@ const ResultCard = ({ result, result_type }) => {
           <CardHeader className="py-4">
             <div className="flex justify-between items-start">
               <CardTitle className={"font-semibold text-md " + `${!isExpanded && "line-clamp-1"}`}>{result.sect_desc}</CardTitle>
-              <Badge variant={"default"}>
-                Section. ({result.sect_no}, {result.subsec_1}
-                {result.subsec_2}
-                {result.subsec_3}), {result.chapter_no}
-              </Badge>
+              <div className="space-x-2">
+                <Badge variant={"destructive"} className="shrink-0 ml-2 bg-blue-700">
+                  Section. ({result.sect_no}, {result.subsec_1}
+                  {result.subsec_2}
+                  {result.subsec_3}), {result.chapter_no}
+                </Badge>
+
+                <Badge className="shrink-0" onClick={() => generateTrademarkPDF()}>
+                  Save as PDF
+                </Badge>
+              </div>
             </div>
             <div className="gap-4 grid mt-4">
               <div>
@@ -122,7 +159,7 @@ const ResultCard = ({ result, result_type }) => {
 
       {result_type === "judgement" && (
         <div className="text-center">
-          <CardTitle className={"font-semibold text-lg " + `${!isExpanded && "line-clamp-1"}`}> Result of this Case is "{result.result}</CardTitle>
+          <CardTitle className={"font-semibold text-lg " + `${!isExpanded && "line-clamp-1"}`}> Result of this Case is {result.result}</CardTitle>
         </div>
       )}
     </>

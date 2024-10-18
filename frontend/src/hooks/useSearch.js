@@ -13,6 +13,7 @@ const useSearch = () => {
   const [judgementClassificationResult, setJudgementClassificationResult] = useState([]);
 
   const search = async (searchType, inputType, data, isfromHistory = false) => {
+    console.log("USESEARCH", data, inputType, searchType);
     setLoading(true); //! Start loading
 
     let query_data = {};
@@ -30,9 +31,12 @@ const useSearch = () => {
         } else {
           query_data = { text: data.text, query_type: "text" };
         }
+
         const response = await axios.get("http://192.168.0.2:8000/search/trademarksearch", {
           params: query_data,
         });
+        console.log("RESPONSE", response.data);
+
         setTrademarkSearchResult(response.data);
       } else if (searchType === "judgement") {
         query_data = { text: data.text };

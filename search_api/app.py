@@ -5,7 +5,7 @@ from ml_models import load_models
 
 def create_app():
     app = Flask(__name__)
-    app.config["API_TITLE"] = "Stores REST API"
+    app.config["API_TITLE"] = "Legal Search Models REST API"
     app.config["API_VERSION"] = "v1"
     app.config["OPENAPI_VERSION"] = "3.0.3"
     app.config["OPENAPI_URL_PREFIX"] = "/"

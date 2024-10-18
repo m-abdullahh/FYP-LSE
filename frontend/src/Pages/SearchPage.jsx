@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import useSearch from "@/hooks/useSearch"; // Import the custom hook
 import { useLocation } from "react-router-dom"; // Import useLocation
+import toast from "react-hot-toast";
 
 //! TEXT SCHEMA
 const textSchema = z
@@ -59,20 +60,21 @@ const SearchPage = () => {
   });
 
   useEffect(() => {
+    console.log("STATE", state);
     if (state && state.searchType !== "") {
-      console.log("STATE", state);
-      // Set the search type and input based on the state
       setSearchType(state.searchType);
       if (state.queryData) {
-        if (state.searchType === "trademark" && Number.isInteger(state.queryData)) {
+        if (state.searchType === "trademark" && state.query_type === "section") {
           setInputType("section");
-          form.setValue("section", state.queryData); // Set section value
-        } else {
+          form.setValue("section", state.queryData.section_no); // Set section value
+        } else if (state.searchType === "trademark" && state.query_type === "text") {
           setInputType("text");
+          form.setValue("text", state.queryData.section); // Set section value
+        } else {
           form.setValue("text", state.queryData.text); // Set text value
         }
       }
-      search(searchType, inputType, form.getValues(), true); // Perform search based on the state
+      search(state.searchType, state.query_type, form.getValues(), true); // Perform search based on the state
     }
   }, [state, form]);
 
@@ -88,6 +90,10 @@ const SearchPage = () => {
   // On submit
   const onSubmit = async (data) => {
     await search(searchType, inputType, data); // Call the search function from the custom hook
+    if (searchType === "judgement") {
+      console.log(judgementClassificationResult);
+      toast.success("Result of this Case is: " + judgementClassificationResult.result);
+    }
   };
 
   return (
@@ -119,6 +125,7 @@ const SearchPage = () => {
         ) : (
           <>
             {genericSearchResult.length > 0 &&
+              Array.isArray(genericSearchResult) &&
               genericSearchResult.map((result, index) => <ResultCard key={index} result={result} result_type={searchType} />)}
 
             {trademarkSearchResult.length > 0 &&

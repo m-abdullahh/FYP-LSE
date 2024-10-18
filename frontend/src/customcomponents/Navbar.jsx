@@ -29,9 +29,11 @@ const Navbar = () => {
         navigate("/search", { state: { searchType: entry.searchType, queryData: entry.query_data } }); // Navigate to the search results page
         break;
       case "trademark":
-        // Check if the entry's query data is an integer
-        const isInteger = Number.isInteger(entry.query_data);
-        navigate("/search", { state: { searchType: entry.searchType, queryData: entry.query_data } }); // Navigate to the search results page
+        if (entry.query_data.query_type === "section_no") {
+          navigate("/search", { state: { searchType: entry.searchType, queryData: entry.query_data, query_type: "section" } }); // Navigate to the search results page
+        } else {
+          navigate("/search", { state: { searchType: entry.searchType, queryData: entry.query_data, query_type: "text" } });
+        }
         break;
       case "judgement":
         navigate("/search", { state: { searchType: entry.searchType, queryData: entry.query_data } }); // Navigate to the search results page
@@ -101,7 +103,7 @@ const Navbar = () => {
                           <div className="w-full flex justify-between items-center">
                             <div className="flex items-center space-x-1">
                               <HistoryIcon className="w-4 h-4" />
-                              <span>{entry.query_data.text}</span>
+                              <span>{entry.searchType === "generic" ? entry.query_data.text : "Section No " + entry.query_data.section_no}</span>
                             </div>
                             <button onClick={() => deleteSearchEntry(entry._id)}>
                               <Trash className="w-4 h-4 self-end" />
