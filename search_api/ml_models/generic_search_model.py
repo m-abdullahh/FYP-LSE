@@ -39,7 +39,7 @@ def load_generic_search_model(save_embeddings=False):
     print("Model loaded and data ready.")
     return model, df, required_columns
 
-def query_generic_search_model(model, df, required_columns, query, top_k=3):
+def query_generic_search_model(model, df, required_columns, query, top_k=1):
     query_embeddings = model.encode(query, convert_to_tensor=True)
 
     selected_columns = required_columns
